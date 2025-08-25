@@ -1,7 +1,8 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, hash::Hash};
 
-use ordered_float::OrderedFloat;
 use rand::{rng, seq::IteratorRandom};
+
+use crate::model::number::Number;
 
 #[derive(Clone, PartialEq, Eq, Hash)]
 pub enum Operation {
@@ -9,24 +10,42 @@ pub enum Operation {
     Sum, Sub, Mul, Div, Pow
 }
 
-#[derive(Clone, PartialEq, Eq, Hash)]
-pub enum Token {
-    Constant(OrderedFloat<f64>),
+#[derive(Clone)]
+pub enum Token<T: Number> {
+    Constant(T),
     Operation(Operation)
 }
 
-pub struct Expression {
-    tokens: Vec<Token>
+impl<T: Number> PartialEq for Token<T> {
+    fn eq(&self, other: &Self) -> bool {
+        match (self, other) {
+            (Self::Constant(l0), Self::Constant(r0)) => l0 == r0,
+            (Self::Operation(l0), Self::Operation(r0)) => l0 == r0,
+            _ => false,
+        }
+    }
+}
+
+impl<T: Number> Eq for Token<T> {}
+
+impl<T: Number> Hash for Token<T> {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        core::mem::discriminant(self).hash(state);
+    }
+}
+
+pub struct Expression<T: Number> {
+    tokens: Vec<Token<T>>
 }
 
 #[derive(Clone)]
-pub enum InfixExpression {
-    Constant(f64),
-    Unary(Operation, Box<InfixExpression>),
-    Binary(Operation, Box<InfixExpression>, Box<InfixExpression>)
+pub enum InfixExpression<T: Number> {
+    Constant(T),
+    Unary(Operation, Box<InfixExpression<T>>),
+    Binary(Operation, Box<InfixExpression<T>>, Box<InfixExpression<T>>)
 }
 
-impl Token {
+impl<T: Number> Token<T> {
     pub fn arity(&self) -> usize {
         match self {
             Token::Constant(_) => 0,
@@ -83,8 +102,8 @@ impl Operation {
     }
 }
 
-impl Expression {
-    pub fn random(choices: &HashMap<Token, isize>) -> Self {
+impl<T: Number> Expression<T> {
+    pub fn random(choices: &HashMap<Token<T>, isize>) -> Self {
         let mut rng = rng();
 
         let mut tokens = vec!();
@@ -129,7 +148,7 @@ impl Expression {
         Expression { tokens }
     }
 
-    pub fn calculate(&self) -> f64 {
+    pub fn calculate(&self) -> T {
         let mut stack = vec!();
 
         macro_rules! binary {
@@ -145,7 +164,7 @@ impl Expression {
 
         for t in &self.tokens {
             match t {
-                Token::Constant(f) => stack.push(f.into_inner()),
+                Token::Constant(f) => stack.push(*f),
                 
                 Token::Operation(op) => match op {
                     Operation::Neg => {
@@ -169,7 +188,7 @@ impl Expression {
                         let a = stack.pop().unwrap();
                         let b = stack.pop().unwrap();
 
-                        stack.push(a.powf(b));
+                        stack.push(a.pow(&b));
                     },
                 },
             }
@@ -178,12 +197,12 @@ impl Expression {
         stack.last().copied().unwrap()
     }
 
-    pub fn to_infix(&self) -> InfixExpression {
+    pub fn to_infix(&self) -> InfixExpression<T> {
         let mut stack = vec!();
 
         for token in &self.tokens {
             match token {
-                Token::Constant(f) => stack.push(InfixExpression::Constant(f.into_inner())),
+                Token::Constant(f) => stack.push(InfixExpression::Constant(*f)),
 
                 Token::Operation(op) => match op {
                     Operation::Neg |
@@ -218,7 +237,7 @@ impl Expression {
     }
 }
 
-impl InfixExpression {
+impl<T: Number> InfixExpression<T> {
     pub fn needs_parentheses(&self) -> bool {
         use Operation::*;
         use InfixExpression::*;
