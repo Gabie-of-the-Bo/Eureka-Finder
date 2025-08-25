@@ -14,7 +14,7 @@ fn main() {
 
     let mut choices = [
         (Operation(Neg), -1),
-        // (Operation(Sqrt), -1),
+        (Operation(Sqrt), -1),
         (Operation(Sum), -1),
         (Operation(Sub), -1),
         (Operation(Mul), -1),
@@ -26,8 +26,8 @@ fn main() {
         choices.insert(Constant((i as f64).into()), 1);
     }
 
-    let objective = E;
-    let threshold = 1e-4;
+    let objective = PI;
+    let threshold = 1e-6;
 
     let expr = (0..).into_iter()
         .par_bridge()
@@ -36,6 +36,7 @@ fn main() {
         .unwrap();
 
     let res = expr.calculate();
+    let error = (res - objective).abs().log10().abs().floor();
 
-    println!("Result: {} => {} (Diff: {})", expr.repr(), res, (res - objective).abs());
+    println!("Result:\n\t{}\n\t{}\n\t{} (Correct digits: {})", expr.to_infix().to_string(), expr.to_infix().to_latex(), res, error);
 }
