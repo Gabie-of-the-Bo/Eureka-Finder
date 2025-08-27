@@ -4,7 +4,7 @@ use num::{Complex, Float};
 
 pub trait Number
 where
-    Self: Copy + Clone + PartialEq + Display,
+    Self: Copy + Clone + PartialEq,
     Self: Add<Output = Self> + Sub<Output = Self> + Mul<Output = Self> + Div<Output = Self> + Neg<Output = Self>,
     Self: Send + Sync
 {
@@ -12,6 +12,7 @@ where
     fn pow(&self, other: &Self) -> Self;
     fn distance(&self, other: &Self) -> f64;
     fn from_f32(n: f32) -> Self;
+    fn to_string(&self) -> String;
 }
 
 impl Number for f32 {
@@ -29,6 +30,10 @@ impl Number for f32 {
     
     fn from_f32(n: f32) -> Self {
         n
+    }
+    
+    fn to_string(&self) -> String {
+        ToString::to_string(&self)
     }
 }
 
@@ -48,6 +53,10 @@ impl Number for f64 {
     fn from_f32(n: f32) -> Self {
         n as f64
     }
+    
+    fn to_string(&self) -> String {
+        ToString::to_string(&self)
+    }
 }
 
 impl<T: Float + Display + Send + Sync + Into<f64> + From<f32>> Number for Complex<T> {
@@ -65,5 +74,17 @@ impl<T: Float + Display + Send + Sync + Into<f64> + From<f32>> Number for Comple
     
     fn from_f32(n: f32) -> Self {
         Complex { re: n.into(), im: T::zero() }
+    }
+    
+    fn to_string(&self) -> String {
+        if self.im.is_zero() {
+            self.re.to_string()
+
+        } else if self.re.is_zero() {
+            format!("({}i)", self.im)
+
+        } else {
+            format!("({})", self)
+        }
     }
 }

@@ -258,7 +258,7 @@ impl<T: Number> InfixExpression<T> {
             
             InfixExpression::Unary(op, a) => {
                 if let InfixExpression::Constant(n) = **a {
-                    format!("{}{}", op.repr(), n)
+                    format!("{}{}", op.repr(), n.to_string())
                 
                 } else {
                     format!("{}({})", op.repr(), a.to_string())
@@ -267,14 +267,14 @@ impl<T: Number> InfixExpression<T> {
 
             InfixExpression::Binary(op, a, b) => {
                 let a_str = if let InfixExpression::Constant(n) = **a {
-                    format!("{}", n)
+                    format!("{}", n.to_string())
                 
                 } else {
                     format!("({})", a.to_string())
                 };
 
                 let b_str = if let InfixExpression::Constant(n) = **b {
-                    format!("{}", n)
+                    format!("{}", n.to_string())
                 
                 } else {
                     format!("({})", b.to_string())

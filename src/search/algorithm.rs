@@ -18,7 +18,7 @@ pub fn find_expression<T: Number>(objective: T, threshold: f64) -> Expression<T>
         (Operation(Pow), -1),
     ].into_iter().collect::<HashMap<_, _>>();
 
-    for i in 0..10 {
+    for i in 1..10 {
         choices.insert(Constant(T::from_f32(i as f32)), 1);
     }
 
