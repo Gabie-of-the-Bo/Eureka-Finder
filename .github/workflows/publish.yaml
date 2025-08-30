@@ -46,7 +46,7 @@ jobs:
       - name: Build Angular project
         run: |
           cd web
-          npm run build -- --prod --output-path=dist
+          npm run build --prod --output-path=dist
 
       # Deploy to GitHub Pages
       - name: Deploy to GitHub Pages
