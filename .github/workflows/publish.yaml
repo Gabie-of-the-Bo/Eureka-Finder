@@ -1,0 +1,57 @@
+name: Build and publish
+
+on:
+  push:
+    branches:
+      - main  # adjust if needed
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Set up Node.js for Angular
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+
+      # Set up Rust
+      - name: Set up Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+
+      # Install wasm-pack
+      - name: Install wasm-pack
+        run: cargo install wasm-pack
+
+      # Build Rust project as WASM
+      - name: Build Rust WASM
+        run: |
+          export RUSTFLAGS='--cfg getrandom_backend="wasm_js"'
+          wasm-pack build --target bundler
+
+      # Install Angular dependencies
+      - name: Install Angular dependencies
+        run: |
+          cd web
+          npm ci
+
+      # Build Angular project
+      - name: Build Angular project
+        run: |
+          cd web
+          npm run build -- --prod --output-path=dist
+
+      # Deploy to GitHub Pages
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./web/dist
+          publish_branch: gh-pages
