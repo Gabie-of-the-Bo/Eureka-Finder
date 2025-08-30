@@ -1,3 +1,8 @@
+use js_sys::{Date, Function};
+use wasm_bindgen::prelude::*;
+
+use crate::{model::number::Number, search::algorithm::find_expression};
+
 pub mod model {
     pub mod expr;
     pub mod number;
@@ -8,53 +13,29 @@ pub mod search {
     pub mod algorithm;
 }
 
-#[cfg(test)]
-mod test {
-    use std::f64::consts::PI;
+#[wasm_bindgen]
+pub fn find_function(inputs: &str, objective: f64, threshold: f64, max_seconds: usize, render_callback: Function) {
+    let mut min_dist = 1e100;
 
-    use num::Complex;
+    let start = Date::now();
 
-    use crate::{model::number::Number, search::algorithm::find_expression};
+    loop {
+        let expr = find_expression(inputs, objective);
 
-    pub fn test_approx<T: Number>(inputs: &str, objective: T, thres: f64) {
-        let expr = find_expression(inputs, objective, thres);
+        let latex = expr.to_infix().to_latex();
+        let result = expr.calculate();
+        let distance = result.distance(&objective);
 
-        assert!(expr.calculate().distance(&objective) < thres)
-    }
+        if distance < min_dist {
+            min_dist = distance;
+    
+            render_callback.call3(
+                &JsValue::NULL, &latex.into(), &result.to_latex().into(), &distance.into()
+            ).expect("Error while executing callback");
 
-    #[test]
-    fn f32_approx() {
-        test_approx(
-            "+,-,/,*,^,neg,sqrt,1-9",
-            PI as f32,
-            1e-4
-        );
-    }
-
-    #[test]
-    fn f64_approx() {
-        test_approx(
-            "+,-,/,*,^,neg,sqrt,1-9",
-            PI,
-            1e-4
-        );
-    }
-
-    #[test]
-    fn complex_f32_approx() {
-        test_approx(
-            "+,-,/,*,^,neg,sqrt,1-9",
-            Complex::<f32>::from(PI as f32),
-            1e-4
-        );
-    }
-
-    #[test]
-    fn complex_f64_approx() {
-        test_approx(
-            "+,-,/,*,^,neg,sqrt,1-9",
-            Complex::<f64>::from(PI),
-            1e-4
-        );
+            if distance < threshold || (max_seconds > 0 && Date::now() - start > (1000 * max_seconds) as f64) {
+                break;
+            }
+        }
     }
 }

@@ -12,7 +12,7 @@ where
     fn pow(&self, other: &Self) -> Self;
     fn distance(&self, other: &Self) -> f64;
     fn from_f32(n: f32) -> Self;
-    fn to_string(&self) -> String;
+    fn to_latex(&self) -> String;
 }
 
 impl Number for f32 {
@@ -32,7 +32,7 @@ impl Number for f32 {
         n
     }
     
-    fn to_string(&self) -> String {
+    fn to_latex(&self) -> String {
         ToString::to_string(&self)
     }
 }
@@ -54,7 +54,7 @@ impl Number for f64 {
         n as f64
     }
     
-    fn to_string(&self) -> String {
+    fn to_latex(&self) -> String {
         ToString::to_string(&self)
     }
 }
@@ -76,7 +76,7 @@ impl<T: Float + Display + Send + Sync + Into<f64> + From<f32>> Number for Comple
         Complex { re: n.into(), im: T::zero() }
     }
     
-    fn to_string(&self) -> String {
+    fn to_latex(&self) -> String {
         if self.im.is_zero() {
             self.re.to_string()
 

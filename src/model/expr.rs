@@ -55,7 +55,7 @@ impl<T: Number> Token<T> {
 
     pub fn repr(&self) -> String {
         match self {
-            Token::Constant(f) => f.to_string(),
+            Token::Constant(f) => f.to_latex(),
             Token::Operation(op) => op.repr().to_string(),
         }
     }
@@ -254,11 +254,11 @@ impl<T: Number> InfixExpression<T> {
 
     pub fn to_string(&self) -> String {
         match self {
-            InfixExpression::Constant(n) => n.to_string(),
+            InfixExpression::Constant(n) => n.to_latex(),
             
             InfixExpression::Unary(op, a) => {
                 if let InfixExpression::Constant(n) = **a {
-                    format!("{}{}", op.repr(), n.to_string())
+                    format!("{}{}", op.repr(), n.to_latex())
                 
                 } else {
                     format!("{}({})", op.repr(), a.to_string())
@@ -267,14 +267,14 @@ impl<T: Number> InfixExpression<T> {
 
             InfixExpression::Binary(op, a, b) => {
                 let a_str = if let InfixExpression::Constant(n) = **a {
-                    format!("{}", n.to_string())
+                    format!("{}", n.to_latex())
                 
                 } else {
                     format!("({})", a.to_string())
                 };
 
                 let b_str = if let InfixExpression::Constant(n) = **b {
-                    format!("{}", n.to_string())
+                    format!("{}", n.to_latex())
                 
                 } else {
                     format!("({})", b.to_string())
@@ -289,7 +289,7 @@ impl<T: Number> InfixExpression<T> {
         use Operation::*;
 
         match self {
-            InfixExpression::Constant(n) => n.to_string(),
+            InfixExpression::Constant(n) => n.to_latex(),
             
             InfixExpression::Unary(op, a) => {
                 match op {

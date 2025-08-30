@@ -1,0 +1,72 @@
+<div class="page">
+  <div class="topbar">
+    <div class="logo">
+      <span>Eureka </span>
+      <span>Finder </span>
+      <span>Pandigital operation searcher</span>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="explanation">
+      <h3>What is a pandigital operation?</h3>
+      <p>
+        A <b>pandigital operation</b> usually refers to a mathematical expression that uses each digit from 1 to 9 <b>exactly once</b> 
+        (or sometimes 0 to 9, depending on context) to form a valid arithmetic equation. The idea is that every digit appears 
+        exactly once across the numbers and operations in the expression. Eureka Finder is a simple tool that allows you to 
+        <b>find pandigital operations</b> easily using brute force.
+      </p>
+    </div>
+    <div class="result">
+      <div class="inputs">
+        <mat-button-toggle-group class="opSelector" multiple [(ngModel)]="selectedOps">
+          <mat-button-toggle *ngFor="let op of operations" [value]="op.value">
+            <mat-icon *ngIf="selectedOps.includes(op.value)">check</mat-icon>
+            {{ op.label }}
+          </mat-button-toggle>
+        </mat-button-toggle-group>
+        
+        <mat-form-field class="input-text">
+          <mat-label>Available numbers (comma separated)</mat-label>
+          <input matInput placeholder="Ex. 1-9" [(ngModel)]="inputs">
+        </mat-form-field>
+        
+        <mat-form-field class="input-text">
+          <mat-label>Objective</mat-label>
+          <input matInput type="number" placeholder="Ex. 3.14159265359" [(ngModel)]="objective">
+        </mat-form-field>
+        
+        <mat-form-field class="input-text">
+          <mat-label>Number of correct digits</mat-label>
+          <input matInput type="number" min="0" step="1" placeholder="Ex. 4" [(ngModel)]="correctDigits">
+        </mat-form-field>
+        
+        <mat-form-field class="input-text">
+          <mat-label>Max time to use in seconds (0 is no time limit)</mat-label>
+          <input matInput type="number" min="0" step="1" placeholder="Ex. 10" [(ngModel)]="maxSeconds">
+        </mat-form-field>
+
+        <div class="find">
+          <button mat-raised-button (click)="findOperation()" [disabled]="loading" #find>Find operation</button>
+          <button mat-raised-button (click)="resetToSample()" [disabled]="loading" #find>Sample</button>
+        </div>
+      </div>
+
+      <div class="operation-wrapper">
+        <div class="operation">
+          <div>Operation:</div>
+          <div #latex></div>
+          <div>Result:</div>
+          <div #result></div>
+          <div>Error:</div>
+          <div #distance></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div>© 2025 Gabie-of-the-Bo</div>
+    <div><a href="https://github.com/Gabie-of-the-Bo" target="_blank" rel="noopener noreferrer">GitHub</a></div>
+  </div>
+</div>
