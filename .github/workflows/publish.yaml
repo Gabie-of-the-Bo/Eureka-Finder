@@ -47,7 +47,7 @@ jobs:
         run: |
           cd web
           REPO_NAME=${GITHUB_REPOSITORY#*/}
-          ng build --base-href "/$REPO_NAME/" --deploy-url "/$REPO_NAME/"
+          npx ng build --base-href "/$REPO_NAME/" --deploy-url "/$REPO_NAME/"
 
       # Deploy to GitHub Pages
       - name: Deploy to GitHub Pages
