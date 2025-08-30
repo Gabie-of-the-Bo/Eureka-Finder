@@ -46,7 +46,8 @@ jobs:
       - name: Build Angular project
         run: |
           cd web
-          npm run build --prod --output-path=dist
+          REPO_NAME=${GITHUB_REPOSITORY#*/}
+          npm run build --prod --base-href /$REPO_NAME/ --deploy-url /$REPO_NAME/
 
       # Deploy to GitHub Pages
       - name: Deploy to GitHub Pages
